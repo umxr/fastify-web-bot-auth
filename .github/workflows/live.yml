@@ -1,0 +1,29 @@
+name: Live tests
+
+on:
+  schedule:
+    # Weekly: Mondays at 06:17 UTC (off the top of the hour — GitHub delays/drops top-of-hour crons)
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    name: Live network tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.repository == 'umxr/fastify-web-bot-auth'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: npm
+      - run: npm ci
+      - run: npm test
+        env:
+          LIVE_TESTS: '1'

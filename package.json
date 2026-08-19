@@ -5,6 +5,14 @@
   "type": "module",
   "license": "MIT",
   "author": "Umar <umarg1997@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umxr/fastify-web-bot-auth.git"
+  },
+  "homepage": "https://github.com/umxr/fastify-web-bot-auth#readme",
+  "bugs": {
+    "url": "https://github.com/umxr/fastify-web-bot-auth/issues"
+  },
   "engines": {
     "node": ">=20"
   },

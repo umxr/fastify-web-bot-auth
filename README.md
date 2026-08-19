@@ -1,5 +1,7 @@
 # fastify-web-bot-auth
 
+[![CI](https://github.com/umxr/fastify-web-bot-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/umxr/fastify-web-bot-auth/actions/workflows/ci.yml)
+
 Fastify v5 plugin that verifies **Web Bot Auth** signatures (RFC 9421 HTTP
 Message Signatures + the IETF web-bot-auth drafts) on inbound requests. It
 gives your origin server cryptographic proof of which AI agent is calling —
@@ -235,6 +237,45 @@ npm run lint           # biome
 npx tsc --noEmit       # typecheck
 LIVE_TESTS=1 npm test  # network-gated live test against Cloudflare's example endpoint
 ```
+
+CI runs the lint, typecheck, test (Node 20/22/24), and dist-smoke jobs on
+every PR and push to `main`. The live network test runs only in a weekly
+scheduled workflow (`live.yml`), never on the PR path.
+
+Note: GitHub silently disables scheduled workflows after ~60 days without
+repository activity, and a failing weekly live run only notifies via the
+Actions email — check the Actions tab occasionally.
+
+## Releasing
+
+Releases are automated with
+[release-please](https://github.com/googleapis/release-please) and
+conventional commits:
+
+1. **Write conventional commits** on `main` (`feat:`, `fix:`, `feat!:` /
+   `BREAKING CHANGE:`). release-please opens or updates a release PR that
+   bumps the version and changelog.
+2. **A human merges the release PR.** Auto-merge is not used. The merge
+   creates the GitHub release and tag.
+3. **The publish job runs automatically** on the new release: `npm publish`
+   via npm **trusted publishing** (OIDC) — no `NPM_TOKEN` secret, and npm
+   provenance is attached automatically.
+
+One-time npm setup: on npmjs.com, register a **trusted publisher** for this
+package pointing at this repository (`umxr/fastify-web-bot-auth`) and the
+workflow file `release.yml`. Note that the first-ever publish of a brand-new
+package may need a manual token-based `npm publish` before trusted publishing
+can take over.
+
+Version note: the release-please manifest records `0.1.0` as already
+released, so the **first** release PR proposes the *next* version (e.g.
+`0.1.1` or `0.2.0`) — `0.1.0` itself is never published to npm. This is
+intended behavior, not a bug.
+
+Known limitation: release PRs created with the default `GITHUB_TOKEN` do not
+trigger CI on the release PR itself. The workaround is to configure a PAT or
+GitHub App token for release-please — that requires adding a repository
+secret, so it is intentionally not wired up here.
 
 ## License
 

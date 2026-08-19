@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.repository == 'umxr/fastify-web-bot-auth'
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: release-please
+    if: ${{ github.repository == 'umxr/fastify-web-bot-auth' && needs.release-please.outputs.release_created }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Check out the exact release commit, not whatever main points at now.
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.x
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+      # npm trusted publishing (OIDC) requires npm >= 11.5.1
+      - run: npm install -g npm@11
+      - run: npm ci
+      # Quality gate: release PRs get no CI run, so verify here before publishing.
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:dist
+      # No token: OIDC trusted publishing; provenance is automatic.
+      - run: npm publish
