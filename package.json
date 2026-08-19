@@ -16,6 +16,9 @@
   "engines": {
     "node": ">=20"
   },
+  "publishConfig": {
+    "provenance": true
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
