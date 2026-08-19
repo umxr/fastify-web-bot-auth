@@ -27,5 +27,13 @@
   },
   "organizeImports": {
     "enabled": true
-  }
+  },
+  "overrides": [
+    {
+      "include": ["package.json", ".release-please-manifest.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
