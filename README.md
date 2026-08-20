@@ -51,6 +51,15 @@ app.get(
 await app.listen({ port: 3000 });
 ```
 
+## Demo
+
+A runnable end-to-end demo lives in
+[`demo/`](https://github.com/umxr/fastify-web-bot-auth/tree/main/demo): a
+local server plus a client that signs requests with the RFC 9421 test key,
+verified live against Cloudflare's hosted key directory (needs internet
+access). From a fresh clone: `npm install && npm run build`, then
+`node demo/server.mjs` and `node demo/client.mjs` in two terminals.
+
 ## The verdict: `request.webBotAuth`
 
 ```ts
